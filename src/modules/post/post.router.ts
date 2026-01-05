@@ -1,15 +1,13 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Router } from "express";
 import { PostController } from "./post.controller";
+import auth, { UserRole } from "../../middlewares/auth";
+
 const router = express.Router();
 
-const auth = () => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    console.log("middleware works");
-    // next();
-  };
-};
+// ===== POST ROUTES =====
+router.post("/", auth(UserRole.USER), PostController.createPost);
 
-router.post("/", auth(), PostController.createPost);-+
+// === GET ALL POSTS ===
 router.get("/", auth(), PostController.getAllPosts);
 
-export const PostRouter = router;
+export const PostRouter: Router = router;
