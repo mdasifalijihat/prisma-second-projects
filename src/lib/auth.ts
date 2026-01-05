@@ -26,14 +26,17 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }) => {
       const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
 
-      await transporter.sendMail({
-        from: `"Prisma Blog" <${process.env.SMTP_EMAIL}>`,
-        to: user.email,
-        subject: "Verify your email",
-        html: `
+      try {
+        await transporter.sendMail({
+          from: `"Prisma Blog" <${process.env.SMTP_EMAIL}>`,
+          to: user.email,
+          subject: "Verify your email",
+          html: `
          <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 500px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px;">
 
@@ -83,9 +86,20 @@ export const auth = betterAuth({
     </div>
   </div>
   `,
-      });
+        });
+      } catch (err) {
+        console.error("Error sending verification email:", err);
+        throw new Error("Could not send verification email");
+      }
+    },
+  },
 
-      console.log(`Verification email sent to ${user.email}: ${url}`);
+  socialProviders: {
+    google: {
+      prompt: "select_account consent",
+      accessType: "offline",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
 
