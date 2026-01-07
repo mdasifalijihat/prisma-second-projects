@@ -25,6 +25,8 @@ export enum UserRole {
 const auth = (...roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // console.log(req.headers);
+      //get user session from better-auth 
       const session = await betterAuth.api.getSession({
         headers: req.headers as any,
       });
