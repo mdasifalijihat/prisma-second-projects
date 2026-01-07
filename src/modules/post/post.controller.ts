@@ -3,12 +3,28 @@ import { PostServices } from "./post.services";
 
 const getAllPosts = async (req: Request, res: Response) => {
   try {
+    // search
     const { search } = req.query;
     const searchString = typeof search === "string" ? search : undefined;
+
+    // tag search
     const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+    // isFeatured filter (not implemented yet)
+    //true and false are the only valid values
+    const isFeatured = req.query.isFeatured
+      ? req.query.isFeatured === "true"
+        ? true
+        : req.query.isFeatured === "false"
+        ? false
+        : undefined
+      : undefined;
+
+    // fetch posts
     const posts = await PostServices.getAllPosts({
       search: searchString,
       tags,
+      isFeatured,
     });
 
     res.status(200).json(posts);
