@@ -2,14 +2,15 @@ import { Request, Response } from "express";
 import { PostServices } from "./post.services";
 
 const getAllPosts = async (req: Request, res: Response) => {
-
   try {
     const { search } = req.query;
     const searchString = typeof search === "string" ? search : undefined;
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
     const posts = await PostServices.getAllPosts({
       search: searchString,
+      tags,
     });
-    
+
     res.status(200).json(posts);
   } catch (error) {
     res.status(400).json({

@@ -1,4 +1,7 @@
-import { Payload } from "./../../../generated/prisma/internal/prismaNamespace";
+import {
+  Payload,
+  PostWhereInput,
+} from "./../../../generated/prisma/internal/prismaNamespace";
 import { Post } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
@@ -15,13 +18,50 @@ const createPost = async (
   return result;
 };
 
-const getAllPosts = async (payload: { search: string | undefined }) => {
+const getAllPosts = async ({
+  search,
+  tags,
+}: {
+  search: string | undefined;
+  tags: string[] | [];
+}) => {
+  const andConditions: PostWhereInput[] = [];
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          title: {
+            contains: search as string,
+            mode: "insensitive",
+          },
+        },
+        {
+          content: {
+            contains: search as string,
+            mode: "insensitive",
+          },
+        },
+        {
+          tags: {
+            has: search as string,
+          },
+        },
+      ],
+    });
+  }
+
+  if (tags.length > 0) {
+    andConditions.push({
+      tags: {
+        hasEvery: tags,
+      },
+    });
+  }
+
   const results = await prisma.post.findMany({
     where: {
-      title: {
-        contains: payload.search as string,
-        mode: "insensitive",
-      },
+      AND: { ...andConditions },
     },
   });
   return results;
