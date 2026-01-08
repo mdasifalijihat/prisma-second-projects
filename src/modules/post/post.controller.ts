@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { PostServices } from "./post.services";
 import { PostStatus } from "../../../generated/prisma/enums";
+import { PostServices } from "./post.services";
 
 const getAllPosts = async (req: Request, res: Response) => {
   try {
