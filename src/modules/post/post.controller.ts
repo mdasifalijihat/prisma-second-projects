@@ -28,6 +28,11 @@ const getAllPosts = async (req: Request, res: Response) => {
     const authorId = req.query.authorId as string | undefined;
 
 
+    // pagination 
+    const page = Number(req.query.page ?? 1); 
+    const limit = Number(req.query.limit ?? 10)
+
+
     // fetch posts
     const posts = await PostServices.getAllPosts({
       search: searchString,
@@ -35,6 +40,7 @@ const getAllPosts = async (req: Request, res: Response) => {
       isFeatured,
       status,
       authorId,
+      page, limit, 
     });
 
     res.status(200).json(posts);
