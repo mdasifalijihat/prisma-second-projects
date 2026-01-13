@@ -2,7 +2,11 @@ import {
   Payload,
   PostWhereInput,
 } from "./../../../generated/prisma/internal/prismaNamespace";
-import { Post, PostStatus } from "../../../generated/prisma/client";
+import {
+  CommentStats,
+  Post,
+  PostStatus,
+} from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createPost = async (
@@ -123,6 +127,7 @@ const getAllPosts = async ({
   };
 };
 
+// service to get post by id and increment view count
 const getPostById = async (postId: string) => {
   return await prisma.$transaction(async (tx) => {
     await tx.post.update({
@@ -136,6 +141,28 @@ const getPostById = async (postId: string) => {
     const postData = await tx.post.findUnique({
       where: {
         id: postId,
+      },
+      include: {
+        comments: {
+          where: {
+            parentId: null,
+            status: CommentStats.APPROVED,
+          },
+          include: {
+            replies: {
+              where: {
+                status: CommentStats.APPROVED,
+              },
+              include: {
+                replies: {
+                  where: {
+                    status: CommentStats.APPROVED,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     return postData;
