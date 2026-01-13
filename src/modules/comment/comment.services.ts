@@ -1,5 +1,6 @@
 import { prisma } from "../../lib/prisma";
 
+// == Service to create a comment ==
 const createComment = async (payload: {
   content: string;
   authorId: string;
@@ -23,6 +24,40 @@ const createComment = async (payload: {
   return result;
 };
 
+// ==get comment id by id service==
+const getCommentById = async (id: string) => {
+  return await prisma.comment.findUnique({
+    where: { id },
+    include: {
+      post: {
+        select: {
+          id: true,
+          title: true,
+          views: true,
+        },
+      },
+    },
+  });
+};
+
+// == specify user authorship in services ==
+const getCommentByAuthorId = async (authorId: string) => {
+  return await prisma.comment.findMany({
+    where: { authorId },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      post: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+  });
+};
+
 export const commentServices = {
   createComment,
+  getCommentById,
+  getCommentByAuthorId,
 };
