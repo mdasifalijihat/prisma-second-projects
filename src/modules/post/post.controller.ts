@@ -37,8 +37,9 @@ const getAllPosts = async (req: Request, res: Response) => {
     // const sortBy = req.query.sortBy as string | undefined;
     // const sortOrder = req.query.sortOrder as string | undefined;
 
-    const options = paginationSortingHelper(req.query);
-    console.log("Pagination Options:", options);
+    const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(
+      req.query
+    );
 
     // fetch posts
     const posts = await PostServices.getAllPosts({
@@ -80,7 +81,23 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
+
+// get post by id
+const getPostById = async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.id as string;
+    const post = await PostServices.getPostById(postId);
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to retrieve post",
+      details: error,
+    });
+  }
+};
+
 export const PostController = {
   createPost,
   getAllPosts,
+  getPostById,
 };
