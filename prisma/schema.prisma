@@ -34,9 +34,9 @@ model Comment {
   status    CommentStats @default(APPROVED)
   createAt  DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-  parent    Comment?     @relation("CommentReplies", fields: [parentId], references: [id])
+  parent    Comment?     @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[]    @relation("CommentReplies")
-  post      Post         @relation(fields: [postId], references: [id])
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId])
   @@index([authorId])
@@ -117,5 +117,3 @@ enum CommentStats {
   APPROVED
   REJECT
 }
-
-
