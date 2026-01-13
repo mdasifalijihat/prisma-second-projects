@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { commentServices } from "./comment.services";
+import { success } from "better-auth/*";
 
 // == Controller to create a comment ==
 const createComment = async (req: Request, res: Response) => {
@@ -46,8 +47,31 @@ const getCommentByAuthorId = async (req: Request, res: Response) => {
   }
 };
 
+// == deleted comment controller ==
+const deleteComment = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { commentId } = req.params;
+    await commentServices.deleteComment(
+      commentId as string,
+      user?.id as string
+    );
+    res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const CommentController = {
   createComment,
   getCommentById,
   getCommentByAuthorId,
+  deleteComment,
 };

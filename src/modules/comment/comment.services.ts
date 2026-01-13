@@ -1,3 +1,4 @@
+import { auth } from "./../../lib/auth";
 import { prisma } from "../../lib/prisma";
 
 // == Service to create a comment ==
@@ -56,8 +57,28 @@ const getCommentByAuthorId = async (authorId: string) => {
   });
 };
 
+// === deleted comment service ===
+const deleteComment = async (commentId: string, authorId: string) => {
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      authorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!commentData) {
+    throw new Error("Comment not found or unauthorized");
+  }
+  return await prisma.comment.delete({
+    where: { id: commentId },
+  });
+};
+
 export const commentServices = {
   createComment,
   getCommentById,
   getCommentByAuthorId,
+  deleteComment,
 };
