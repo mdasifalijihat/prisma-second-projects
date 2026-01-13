@@ -124,20 +124,22 @@ const getAllPosts = async ({
 };
 
 const getPostById = async (postId: string) => {
-  const updateViewCount = await prisma.post.update({
-    where: { id: postId },
-    data: {
-      views: {
-        increment: 1,
+  return await prisma.$transaction(async (tx) => {
+    await tx.post.update({
+      where: { id: postId },
+      data: {
+        views: {
+          increment: 1,
+        },
       },
-    },
+    });
+    const postData = await tx.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+    return postData;
   });
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId,
-    },
-  });
-  return post;
 };
 
 export const PostServices = {
