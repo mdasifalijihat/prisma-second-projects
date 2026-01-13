@@ -76,9 +76,34 @@ const deleteComment = async (commentId: string, authorId: string) => {
   });
 };
 
+// == comment update service ==
+const updateComment = async (
+  commentId: string,
+  authorId: string,
+  content: string
+) => {
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      authorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!commentData) {
+    throw new Error("Comment not found or unauthorized");
+  }
+  return await prisma.comment.update({
+    where: { id: commentId },
+    data: { content },
+  });
+};
+
 export const commentServices = {
   createComment,
   getCommentById,
   getCommentByAuthorId,
   deleteComment,
+  updateComment,
 };
