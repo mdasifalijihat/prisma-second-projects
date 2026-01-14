@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 async function seedAdmin() {
   try {
-    const adminEmail = "admin1@admin.com";
+    const adminEmail = "admin@gmail.com";
 
     // 1️⃣ Check user
     const existingUser = await prisma.user.findUnique({

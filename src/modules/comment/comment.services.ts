@@ -1,5 +1,6 @@
 import { auth } from "./../../lib/auth";
 import { prisma } from "../../lib/prisma";
+import { CommentStats } from "../../../generated/prisma/enums";
 
 // == Service to create a comment ==
 const createComment = async (payload: {
@@ -100,10 +101,27 @@ const updateComment = async (
   });
 };
 
+// === moderate Comment Services ===
+const moderateComment = async (id: string, data: { status: CommentStats }) => {
+  const commentData = await prisma.comment.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return await prisma.comment.update({
+    where: { id },
+    data: { status: data.status },
+  });
+};
+
 export const commentServices = {
   createComment,
   getCommentById,
   getCommentByAuthorId,
   deleteComment,
   updateComment,
+  moderateComment,
 };
